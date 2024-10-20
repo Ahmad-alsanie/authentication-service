@@ -11,15 +11,17 @@ spring:
       mode: always
     before: datasource-initialization
 
+## TODO: update prod yaml ddl-auto: none
 jpa:
   hibernate:
-    ddl-auto: update
+    ddl-auto: none
   show-sql: true
   database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+## TODO: Use proper secret
 security:
   jwt:
-    secret: ${SECRET_KEY:FLv2CBpFozio1v8QbGG0rQ==}
+    secret: ${SECRET_KEY:w6hZmYUXbmC++nZcF8L2mFJ1ZaNzfUqwvK7jR6NRY8c=}
     expiration: 3600000 # 1 hour in milliseconds
 
 server:
