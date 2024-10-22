@@ -1,26 +1,34 @@
 package com.quantum.authentication.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
 
-    @Value("${security.jwt.secret}")
-    private String SECRET_KEY;
+    private final SecretKey secretKey;
+    private final long jwtExpiration;
 
-    @Value("${security.jwt.expiration}")
-    private long JWT_EXPIRATION;
+    // Constructor to initialize the secret key and expiration time
+    public JwtUtil(@Value("${security.jwt.secret}") String base64Secret,
+                   @Value("${security.jwt.expiration}") long jwtExpiration) {
+        byte[] decodedKey = Base64.getDecoder().decode(base64Secret);
+        this.secretKey = Keys.hmacShaKeyFor(decodedKey);  // Convert the Base64-encoded secret into a SecretKey
+        this.jwtExpiration = jwtExpiration;
+    }
 
-    // Extracts the username from the JWT token
+    // Extracts the username (subject) from the JWT token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -38,14 +46,15 @@ public class JwtUtil {
 
     // Extracts all claims from the JWT token
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
     // Checks if the token is expired
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -61,8 +70,8 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -71,5 +80,9 @@ public class JwtUtil {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
-}
 
+    // Expose the SecretKey for testing purposes (optional, remove in production)
+    public SecretKey getSecretKey() {
+        return secretKey;
+    }
+}
