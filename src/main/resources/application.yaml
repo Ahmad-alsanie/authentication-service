@@ -8,6 +8,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   sql:
     before: datasource-initialization
+    init:
+      mode: always
 
 jpa:
   hibernate:
@@ -21,9 +23,11 @@ security:
     expiration: 3600000 # 1 hour in milliseconds
 
 server:
-  port: 8088
+  port: 8099
 
 logging:
   level:
     org.springframework.jdbc.datasource.init.ScriptUtils: DEBUG
     org.hibernate.SQL: DEBUG
+    org.springframework.security: DEBUG
+    com.quantum.authentication: DEBUG

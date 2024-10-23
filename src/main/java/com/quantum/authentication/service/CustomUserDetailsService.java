@@ -3,6 +3,7 @@ package com.quantum.authentication.service;
 import com.quantum.authentication.model.UserEntity;
 import com.quantum.authentication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-@Service
+@Service("customUserDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

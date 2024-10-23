@@ -32,7 +32,7 @@ class UserServiceTest {
 
     @Test
     void saveUser_ShouldSaveUserSuccessfully() {
-        // Arrange
+        
         UserEntity user = new UserEntity();
         user.setUsername("johndoe");
         user.setPassword("password123");
@@ -40,10 +40,10 @@ class UserServiceTest {
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword123");
         when(userRepository.save(user)).thenReturn(user);
 
-        // Act
+        
         UserEntity savedUser = userService.registerUser(user);
 
-        // Assert
+        
         assertNotNull(savedUser);
         assertEquals("johndoe", savedUser.getUsername());
         verify(userRepository, times(1)).save(user);
@@ -51,59 +51,56 @@ class UserServiceTest {
 
     @Test
     void findUserById_UserExists_ShouldReturnUser() {
-        long random = 1L;
-        // Arrange
+        
         UserEntity user = new UserEntity();
         user.setId(1L);
         user.setUsername("johndoe");
-        when(userRepository.findById(random)).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        // Act
-        Optional<UserEntity> foundUser = userService.findUserById(
-                random
-        );
+        
+        Optional<UserEntity> foundUser = userService.findUserById(1L);
 
-        // Assert
+        
         assertTrue(foundUser.isPresent());
         assertEquals("johndoe", foundUser.get().getUsername());
-        verify(userRepository, times(1)).findById(random);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void findUserById_UserDoesNotExist_ShouldReturnEmpty() {
-        long random = 1L;
-        // Arrange
-        when(userRepository.findById(random)).thenReturn(Optional.empty());
+        
+        
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act
-        Optional<UserEntity> foundUser = userService.findUserById(random);
+        
+        Optional<UserEntity> foundUser = userService.findUserById(1L);
 
-        // Assert
+        
         assertFalse(foundUser.isPresent());
-        verify(userRepository, times(1)).findById(random);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void deleteUser_ShouldDeleteUserSuccessfully() {
-        long random = 1L;
-
-        userService.deleteUser(random);
 
 
-        verify(userRepository, times(1)).deleteById(random);
+        userService.deleteUser(1L);
+
+
+        verify(userRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteUser_NonExistentUser_ShouldDoNothing() {
-        long random = 1L;
-        // Arrange
-        doNothing().when(userRepository).deleteById(random);
 
-        // Act
-        userService.deleteUser(random);
+        
+        doNothing().when(userRepository).deleteById(1L);
 
-        // Assert
-        verify(userRepository, times(1)).deleteById(random);
+        
+        userService.deleteUser(1L);
+
+        
+        verify(userRepository, times(1)).deleteById(1L);
     }
 }
 
